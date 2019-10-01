@@ -14,7 +14,7 @@ input{
     margin: 20px 0;
 }
 
-#animalGifs{
+#animalGifs, #favorites{
     display:flex;
     justify-content: space-between;
     flex-wrap: wrap;
