@@ -5,7 +5,7 @@ var position = 0;
 function renderButton() {
     for (i = position; i < animals.length; i++) {
         animal = animals[i].charAt(0).toUpperCase() + animals[i].slice(1);
-        console.log(animal);
+        // console.log(animal);
         $("#buttons-view").append($(`<button class=animal-btn data-name=${animal}>${animal}</button>`));
         position++;
     }
@@ -16,7 +16,7 @@ $("#add-gif").on("click", function (event) {
     event.preventDefault();
 
     newAnimal = $("#gif-input").val().trim();
-    console.log(newAnimal);
+    // console.log(newAnimal);
 
     animals.push(newAnimal);
 
@@ -34,25 +34,25 @@ function displayGif() {
         url: queryURL,
         method: "GET"
     }).then(function (response) {
+        var arr = response.data;
+        arr.forEach(function (gif, i) {
 
-        for (i = 0; i < response.data.length; i++) {
-            console.log(response.data[i])
+            // console.log(gif)
 
             var newDiv = $(`<div class=show-gif>`);
-            var favButton = $(`<button class=fav data-link=${queryURL} data-position=${i}>Mark Favourite</button>`)
+            var favButton = $(`<button class=fav data-animated=${gif.images.fixed_height.url} data-still=${gif.images.fixed_height_still.url} data-rating=${gif.rating} data-title=${gif.title}>Mark Favourite</button>`)
             var newImg = $(`<img data-state=still class=gif>`)
-            var newRating = $("<p>").text(`Rating: ${response.data[i].rating}`);
-            var newTitle = $("<p>").text(`Title: ${response.data[i].title}`);
+            var newRating = $("<p>").text(`Rating: ${gif.rating}`);
+            var newTitle = $("<p>").text(`Title: ${gif.title}`);
 
-            newImg.attr("data-animate", response.data[i].images.fixed_height.url)
-            newImg.attr("data-still", response.data[i].images.fixed_height_still.url)
-            newImg.attr("src", response.data[i].images.fixed_height_still.url);
+            newImg.attr("data-animate", gif.images.fixed_height.url)
+            newImg.attr("data-still", gif.images.fixed_height_still.url)
+            newImg.attr("src", gif.images.fixed_height_still.url);
 
             newDiv.prepend(newImg, newTitle, newRating, favButton);
             $("#animalGifs").prepend(newDiv);
 
-
-        }
+        })
     });
 
 }
@@ -68,80 +68,52 @@ function animateGif() {
     }
 };
 
-function onLoad() {
-    if (localStorage.favLink === undefined) {
-        favLink = [];
-        console.log("is undefined")
-    } else {
-        favLink = JSON.parse(localStorage.favLink)
-        console.log("is defined")
-    }
-
-    if (localStorage.favPosition === undefined) {
-        favPosition = [];
-    } else {
-        favPosition = JSON.parse(localStorage.favPosition)
-    }
-}
-
-onLoad();
+var favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
+// console.log(favorites)
 
 function makeFavorite() {
 
-    favLink.push($(this).attr("data-link"))
-    favPosition.push($(this).attr("data-position"))
+    var userFavs = { favAnimated: $(this).attr("data-animated"), favStill: $(this).attr("data-still"), favTitle: $(this).attr("data-title"), favRating: $(this).attr("data-rating") }
+    // console.log("userFavs = " + JSON.stringify(userFavs));
+    favorites.push(userFavs);
+    // console.log("favorites = " + JSON.stringify(favorites));
 
-    console.log(favLink)
-    console.log(favPosition)
+    localStorage.setItem("favorites", JSON.stringify(favorites));
 
-    localStorage.favLink = JSON.stringify(favLink)
-    localStorage.favPosition = JSON.stringify(favPosition)
-    console.log(localStorage.favLink)
-    console.log(localStorage.favPosition)
-
-    console.log("length" + favLink.length)
-    console.log("length" + favPosition.length)
-
-    loadFavorite()
+    loadFavorite();
 }
 
-var j = 0;
+var globalCount = 0;
 
-//maybe allow hide favorites?
-//need a proper on document ready function
-//need a clear favorite/localStorage function/button
 function loadFavorite() {
-    // for(j=0; j<favLink.length; j++){
-    if (j < favLink.length) {
-        var queryURL = favLink[j]
-        console.log(queryURL)
-        var i = favPosition[j]
-        $.ajax({
-            url: queryURL,
-            method: "GET"
-        }).then(function (response) {
-            console.log(response)
+    var arr = JSON.parse(localStorage.favorites);
+    
+    //needed a global count for it to work and not generate all favorites every time a new one is added
+    for(i=globalCount; i<arr.length; i++){
+    // arr.forEach(function (userFavs, i) {
 
-            var newDiv = $(`<div class=show-gif>`);
-            // var favButton = $(`<button class=fav data-link=${queryURL} data-position=${i}>Mark Favourite</button>`)
-            var newImg = $(`<img data-state=still class=gif>`)
-            var newRating = $("<p>").text(`Rating: ${response.data[i].rating}`);
-            var newTitle = $("<p>").text(`Title: ${response.data[i].title}`);
+        var newDiv = $(`<div class=show-gif>`);
+        var newImg = $(`<img data-state=still class=gif>`)
+        var newRating = $("<p>").text(`Rating: ${arr[i].favRating}`);
+        var newTitle = $("<p>").text(`Title: ${arr[i].favTitle}`);
 
-            newImg.attr("data-animate", response.data[i].images.fixed_height.url)
-            newImg.attr("data-still", response.data[i].images.fixed_height_still.url)
-            newImg.attr("src", response.data[i].images.fixed_height_still.url);
+        newImg.attr("data-animate", arr[i].favAnimated)
+        newImg.attr("data-still", arr[i].favStill)
+        newImg.attr("src", arr[i].favStill);
 
-            newDiv.prepend(newImg, newTitle, newRating);
-            $("#favorites").prepend(newDiv);
-            j++
-            loadFavorite();
-        });
+        newDiv.prepend(newImg, newTitle, newRating);
+        $("#favorites").prepend(newDiv);
+    // })
+    globalCount++;
     }
-    // }
+    
 }
 
-loadFavorite()
+$("#clearFavs").on("click", function () {
+    localStorage.clear();
+    $("#favorites").html("");
+    // console.log(localStorage);
+});
 
 $(document).on("click", ".fav", makeFavorite);
 
@@ -150,3 +122,5 @@ $(document).on("click", ".gif", animateGif);
 $(document).on("click", ".animal-btn", displayGif);
 
 renderButton();
+
+loadFavorite();
