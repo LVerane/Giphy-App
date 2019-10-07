@@ -29,6 +29,20 @@ input{
     margin-right: 0;
 }
 
+.fav-btn{
+    margin-left: 20px;
+}
+
 .show-gif{
     margin: 10px 20px;
+}
+
+.flex{
+    display: flex;
+    justify-content: flex-start;
+}
+
+#gif-result{
+    display: flex;
+    justify-content: space-between;
 }

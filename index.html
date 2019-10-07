@@ -16,25 +16,38 @@
 
 <body>
     <div class="container">
+        <nav class="navbar bg-success">
+            <h2>Look up some suggested gifs...</h2>
+            
+            <form id="gif-form">
+                <label for="gif-input">... or add more!</label>
+                <input type="text" id="gif-input" placeholder="What ya wanna see?">
+                
+                
+                <!-- Button triggers new gif to be added -->
+                <input id="add-gif" type="submit" value="Show me this!">
+            </form>
+            
+            <div id="buttons-view"></div>
+        </nav>
+    </div>
 
-        <div id="buttons-view"></div>
+    <div class="container">
 
-        <form id="gif-form">
-            <label for="gif-input">Search More Gifs!</label>
-            <input type="text" id="gif-input" placeholder="Enter a new animal">
-            <br>
+        <div class="flex" id="fav-box">
+            <h2>Your Favorites</h2>
+            <button class="fav-btn" id="clear-favs">Delete All Favorites</button>
+            <button class="fav-btn" id="show-favs">Show Favorites</button>
+            <button class="fav-btn" id="hide-favs" hidden>Hide Favorites</button>
+        </div>
 
-            <!-- Button triggers new gif to be added -->
-            <input id="add-gif" type="submit" value="Create New Gif Button">
-        </form>
-
-        <button id="clearFavs">Delete All Favorites</button>
-
-        <h1>Your Favorites</h1>
-        <div id="favorites"></div>
-
-        <h1>Awesome Gifs</h1>
+        <div id="favorites" hidden></div>
+        <div id="gif-result" hidden>
+            <h2>Awesome Gifs</h2>
+            <h4>hint: click to animate the gifs!</h4>
+        </div>
         <div id="animalGifs"></div>
+
     </div>
 
 </body>
